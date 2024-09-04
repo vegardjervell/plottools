@@ -2,3 +2,4 @@
 .idea/
 PlotTools.egg-info/
 build/
+plottools/__pycache__

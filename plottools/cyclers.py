@@ -38,7 +38,7 @@ class NormedCmap:
     
     def lined_colorbar(self, lines, ax=None, cax=None, **kwargs):
         cbar = self.colorbar(ax=ax, cax=cax, alpha=0.2, **kwargs)
-        cbar.add_lines(lines, linewidths=2, colors=[self(l) for l in lines])
+        cbar.add_lines([line / self.scaling for line in lines], linewidths=2, colors=[self(l) for l in lines])
         return cbar
 
     def __call__(self, val):

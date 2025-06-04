@@ -3,7 +3,7 @@ from matplotlib.gridspec import GridSpec
 import matplotlib.pyplot as plt
 
 
-def grid_with_cbar(nrows, ncols, cbar_width=0.1, sharey=False, **fig_kwargs):
+def grid_with_cbar(nrows, ncols, cbar_width=0.1, sharey=False, sharex=False, **fig_kwargs):
 
     fig = plt.figure(**fig_kwargs)
     ax_widths = [(1 - cbar_width) / ncols for _ in range(ncols)]
@@ -13,6 +13,10 @@ def grid_with_cbar(nrows, ncols, cbar_width=0.1, sharey=False, **fig_kwargs):
         for ci in range(ncols):
             if (sharey is True) and (ci > 0):
                 axs[ri][ci] = fig.add_subplot(gs[ri, ci], sharey=axs[ri][0])
+                plt.setp(axs[ri][ci].get_yticklabels(), visible=False)
+            elif (sharex is True) and (ri < nrows - 1):
+                axs[ri][ci] = fig.add_subplot(gs[ri, ci], sharex=axs[-1][ci])
+                axs[ri][ci].set_xticklabels([])
             else:
                 axs[ri][ci] = fig.add_subplot(gs[ri, ci])
 

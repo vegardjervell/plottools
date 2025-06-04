@@ -36,8 +36,8 @@ class NormedCmap:
             ax = plt.gca()
         return plt.colorbar(self.get_ScalarMappable(), ax=ax, cax=cax, **kwargs)
     
-    def lined_colorbar(self, lines, ax=None, cax=None, **kwargs):
-        cbar = self.colorbar(ax=ax, cax=cax, alpha=0.2, **kwargs)
+    def lined_colorbar(self, lines, ax=None, cax=None, extend='both', **kwargs):
+        cbar = self.colorbar(ax=ax, cax=cax, alpha=0.2, extend=extend, **kwargs)
         cbar.add_lines([line / self.scaling for line in lines], linewidths=2, colors=[self(l) for l in lines])
         return cbar
 
@@ -58,6 +58,14 @@ class MarkerCycler:
 
     def reset(self):
         self.state = 0
+
+    def set_marker(self, m):
+        idx = self.markers.index(m)
+        start = self.markers[idx:]
+        tail = self.markers[:idx]
+        self.markers = [*start, *tail]
+        self.state = 0
+
     def __call__(self):
         if self.state == len(self.markers):
             warnings.warn('Cycled through all markers! Reusing old markers now.', stacklevel=2)
@@ -72,19 +80,32 @@ class ColorCycler:
         self.colors1 = [c.split(':')[1] for c in mcolors.TABLEAU_COLORS.keys()]
         self.colors2 = [c for c in mcolors.BASE_COLORS.keys()]
         self.colors = self.colors1 + self.colors2[:-1]
+        self.tmp_color = None
+        self.tmp_state = None
 
     def reset(self):
         self.state = 0
 
+    def set_color(self, c):
+        self.tmp_color = c
+        self.tmp_state = self.state
+        self.state = -1
+
     def set_cmap(self, name, maxcount):
         cmap = colormaps[name]
         self.colors = [cmap(i / (maxcount + 1)) for i in range(maxcount)]
+
     def __call__(self):
         if self.state == len(self.colors):
             warnings.warn('Cycled through all colors! Reusing old colors now.', stacklevel=2)
             self.state = 0
-        c = self.colors[self.state]
-        self.state += 1
+        if self.state == -1:
+            c = self.tmp_color
+            self.state = self.tmp_state
+            self.tmp_state = None
+        else:
+            c = self.colors[self.state]
+            self.state += 1
         return c
 
 class LinestyleCycler:
@@ -105,9 +126,16 @@ class LinestyleGradient:
     # Accepts value between 0 and 1
     # 1 gives a solid line, 0 gives (.5, 3)
     # Intermediate values give varying line/gap length that sum to 6
-    def __init__(self, lst=None, reverse=False):
+    def __init__(self, lst=None, reverse=False, norm=None):
+        if (norm is None) or (norm == 'lin'):
+            norm = Normalize
+        elif norm == 'log':
+            norm = LogNorm
+        else:
+            raise KeyError(f'Invalid norm key : {norm}')
+
         if lst is not None:
-            self.norm = Normalize(min(lst), max(lst))
+            self.norm = norm(min(lst), max(lst))
         else:
             self.norm = None
         self.default = (5.5, 5.5) # linelength, gaplength

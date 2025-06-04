@@ -5,3 +5,15 @@ This is a lightweight toolbox I use for a lot of my figure generation with matpl
 It also contains some tools for figure scaling to make figures properly scaled when putting them in a latex document, and a matplotlibrc file that makes figure fonts and text consistent with the style I conmmonly use.
 
 Feel free to take a look :) 
+
+# Installation
+
+Once the package is downloaded, just
+```
+pip install /path/to/plottools
+```
+
+See `demo.py` for some example usage.
+
+# Dependecies
+The package assumes that you have some latex compiler installed, and probably makes some assumptions about where that compiler is found.

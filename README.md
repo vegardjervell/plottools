@@ -8,9 +8,11 @@ Feel free to take a look :)
 
 # Installation
 
-Once the package is downloaded, just
+Just activate your virtual environment, and
 ```
-pip install /path/to/plottools
+git clone https://github.com/vegardjervell/plottools.git
+cd plottools
+pip install .
 ```
 
 See `demo.py` for some example usage.

@@ -26,7 +26,6 @@ def grid_with_cbar(nrows, ncols, cbar_width=0.1, sharey=False, sharex=False, **f
 def shared_cbar(ncols, cbar_width=1, sharey=False, **fig_kwargs):
     widths = [10 for _ in range(ncols + 1)]
     widths[-1] = cbar_width
-    # fig, axs = plt.subplots(1, ncols + 1, gridspec_kw={'width_ratios' : widths}, **fig_kwargs)
     fig = plt.figure(**fig_kwargs)
     gs = GridSpec(1, ncols + 1, width_ratios=widths)
     axs = [_ for _ in range(ncols + 1)]
@@ -37,5 +36,21 @@ def shared_cbar(ncols, cbar_width=1, sharey=False, **fig_kwargs):
             plt.setp(axs[i].get_yticklabels(), visible=False)
 
     axs[-1] = fig.add_subplot(gs[-1])
+
+    return fig, axs
+
+def shared_cbar_vertical(nrows, cbar_width=1, sharex=False, **fig_kwargs):
+    widths = [10 for _ in range(nrows + 1)]
+    widths[0] = cbar_width
+    fig = plt.figure(**fig_kwargs)
+    gs = GridSpec(nrows + 1, 1, height_ratios=widths)
+    axs = [_ for _ in range(nrows + 1)]
+    axs[-1] = fig.add_subplot(gs[-1])
+    for i in range(2, nrows + 1):
+        axs[-i] = fig.add_subplot(gs[-i], sharex=(axs[-1] if (sharex is True) else None))
+        if sharex is True:
+            plt.setp(axs[-i].get_xticklabels(), visible=False)
+
+    axs[0] = fig.add_subplot(gs[0])
 
     return fig, axs
